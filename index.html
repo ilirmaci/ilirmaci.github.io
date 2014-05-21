@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>An app to illustrate clustering</title>
+  <meta charset="utf-8">
+  <meta name="description" content="An app to illustrate clustering">
+  <meta name="author" content="Ilir Maci">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>An app to illustrate clustering</h1>
+    <h2></h2>
+    <p>Ilir Maci<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Introduction</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Clustering data into groups of similar observations is a very
+intuitive concept, but the possible approaches can cause 
+confusion.</p>
+
+<p><a href="https://ilir.shinyapps.io/Assignment1/">This app</a> illustrates the 
+alternative approaches and how to set them up using simple plots that 
+the user can control in real time. The code can be found <a href="https://github.com/ilirmaci/ShinyClustering">here</a>.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>The approach</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>This app uses 90 simulated datapoints of two dimensions. The data is
+designed to have several centroids but no clear boundaries between them.</p>
+
+<p>Two popular approaches are shown and contrasted</p>
+
+<ul>
+<li>K-means clustering, a greedy stochastic algorithm</li>
+<li>Hierarchical clustering, an exhaustive deterministic approach</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>The data</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">x1 &lt;- rep(c(1, 2, 4), c(30, 25, 35))
+x2 &lt;- rep(c(1, 5, 2, 5, 3), c(10, 12, 28, 15, 25))
+set.seed(1235)  ## fixed for consistency between instances
+x1 &lt;- x1 + 0.5 * rnorm(x1)
+x2 &lt;- x2 + 2 + 0.4 * rnorm(x2)
+data &lt;- data.frame(x1, x2)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>K-means clustering</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The app explains and illustrates how to run <em>K-means clustering</em> analysis.</p>
+
+<ol>
+<li>The user needs to pick a target <strong>number of clusters</strong> beforehand</li>
+<li>The <strong>seed</strong> can be changed to show that the process is stochastic</li>
+<li>The <strong>number of iterations</strong> can be increased to ensure a better 
+(more robust) solution</li>
+</ol>
+
+<p>All of this updates the scatterplot with observations colored by cluster.
+Cluster centroids are shown on the plot too.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>Hierarchical clustering</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>If the user chooses <em>Hierarchical clustering</em> the app shows how this 
+approach works on the same data.</p>
+
+<ol>
+<li>Hierarchical clustering is a deterministic procedure</li>
+<li>It produces a dendrogram that shows the distances between
+any two observations in the dataset</li>
+<li>The number of clusters can be chosen afterwards using two
+equivalent methods:
+
+<ul>
+<li>Picking the target number of clusters directly</li>
+<li>Choosing the distance threshold where to cut the tree</li>
+</ul></li>
+</ol>
+
+<p>Both the clustered data and the dendrogram are updated automatically.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Introduction'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='The approach'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='The data'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='K-means clustering'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Hierarchical clustering'>
+         5
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
