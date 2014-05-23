@@ -20,9 +20,7 @@ confusion.
 alternative approaches and how to set them up using simple plots that 
 the user can control in real time. The code can be found [here](https://github.com/ilirmaci/ShinyClustering).
 
-------------
-
-## The approach
+### The approach
 
 This app uses 90 simulated datapoints of two dimensions. The data is
 designed to have several centroids but no clear boundaries between them.
