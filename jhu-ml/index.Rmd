@@ -9,7 +9,7 @@ in 5 different styles that correspond to how well the excercise is performed:
 - throwing elbows to the front (class B)
 - lifting only halfway (class C)
 - lowering only halfway (class D)
-- throwing hips to the fron (class E)
+- throwing hips to the front (class E).
 
 Details about the data and how it was collected can be found at 
 [http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises](http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises). 
@@ -18,9 +18,7 @@ The purpose of this analysis is to correctly predict the class based on
 accelerometer data. We are provided with a training set (with marked classes) 
 and need to produce estimates for an unmarked test set. 
 
-We will be applying a set of learning algorithms and will be using 
-cross-validation to determine the best approach. We read the training data. 
-The file was originally downloaded from 
+The training data file was originally downloaded from 
 [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv).
 ```{r}
 d <- read.csv('data/pml-training.csv', na.strings=c("#DIV/0!", "NA"))
@@ -28,7 +26,7 @@ d$X <- NULL    ## drop line number
 dim(d)         ## too large for str
 ```
 
-The data is has 159 columns, a large number of features, but a quick look at 
+The data has 159 columns, a large number of features, but a quick look at 
 the names and the data itself shows that only some of them have entries on 
 most rows:
 ```{r, fig.height=4}
@@ -44,26 +42,26 @@ ggplot(na.share, aes(x=index, y=share)) + geom_point() +
   labs(list(x="Column index", y="Share of missing values"))
 ```
 
-Most columns are missing 98% or all data. Let's see which ones have mainly 
-non-NA entries and which one are mostly `NA`s
+Most columns are missing 98% or all data. Which columns have mainly 
+non-NA entries and which one are mostly `NA`s?
 ```{r}
 head(na.share[na.share$share < 0.5, ], 10)  ## mostly there
 head(na.share[na.share$share > 0.5, ], 10)  ## mostly missing
 ```
 
-From the names we can see that the columns with missing values are summary 
-statistics of base values, collected over a certain time. Closer inspection 
-reveals that these columns have non-NA entries only when `new_window == "yes"`, 
-which happens at the end of each window (marked by `num_window`). Since we will 
-be trying to predict from real-time data in the test set, we can ignore these 
-columns because they will always be `NA`.
+From the names it becomes clear that the columns with missing values are summary 
+statistics of base values, aggregated over a certain number of observations. 
+Closer inspection reveals that these columns have non-NA entries only when 
+`new_window == "yes"`, which happens at the end of each window 
+(marked by `num_window`). Since I am trying to predict from real-time data in 
+the test set, I can ignore these columns.
 ```{r}
 relevant.cols <- rownames(na.share[na.share$share < 0.5,])
 d <- d[, relevant.cols]
 ```
 
-It is also probable that some of the variables are highly correlated, therefore
-making some features mostly redundant. We can perform a principal components
+It is also possible that some of the variables are highly correlated, therefore
+making some features mostly redundant. I perform principal components
 analysis (PCA) on the data to check whether a small number of components 
 captures most of the variance.
 ```{r, fig.height=4}
@@ -78,13 +76,12 @@ ggplot(explained, aes(x=component, y=cumsum(share))) + geom_line() +
   labs(list(x="First principal components", y="Share of variance"))
 ```
 
-From the plot we see a gradual increase in the explained variation, so we will
-be sticking with the raw predictors. We will be using random forests with 500 
-trees and default settings. This procedure has built-in cross-validation 
-(through out-of-bag error rate), so we do not have to deal with specifying 
-folds in order to estimate the expected out-of-sample error rate.
+The above plot shows a gradual increase in the explained variation, therefore I 
+decided not to use principal components, but raw data. I use random forests 
+with 500 trees and default settings. This procedure has built-in 
+cross-validation (through out-of-bag error rate), so I do not have to deal with specifying folds in order to estimate the expected out-of-sample error rate.
 ```{r}
-require(randomForest)
+require(randomForest, quietly=TRUE)
 model.data <- d[, -(1:6)]      ## all features and classe
 # train model
 set.seed(2014)
