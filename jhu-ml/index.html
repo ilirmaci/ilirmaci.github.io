@@ -202,7 +202,7 @@ in 5 different styles that correspond to how well the excercise is performed:</p
 <li>throwing elbows to the front (class B)</li>
 <li>lifting only halfway (class C)</li>
 <li>lowering only halfway (class D)</li>
-<li>throwing hips to the fron (class E)</li>
+<li>throwing hips to the front (class E).</li>
 </ul>
 
 <p>Details about the data and how it was collected can be found at 
@@ -212,9 +212,7 @@ in 5 different styles that correspond to how well the excercise is performed:</p
 accelerometer data. We are provided with a training set (with marked classes) 
 and need to produce estimates for an unmarked test set. </p>
 
-<p>We will be applying a set of learning algorithms and will be using 
-cross-validation to determine the best approach. We read the training data. 
-The file was originally downloaded from 
+<p>The training data file was originally downloaded from 
 <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>.</p>
 
 <pre><code class="r">d &lt;- read.csv(&quot;data/pml-training.csv&quot;, na.strings = c(&quot;#DIV/0!&quot;, &quot;NA&quot;))
@@ -225,7 +223,7 @@ dim(d)  ## too large for str
 <pre><code>## [1] 19622   159
 </code></pre>
 
-<p>The data is has 159 columns, a large number of features, but a quick look at 
+<p>The data has 159 columns, a large number of features, but a quick look at 
 the names and the data itself shows that only some of them have entries on 
 most rows:</p>
 
@@ -242,8 +240,8 @@ ggplot(na.share, aes(x = index, y = share)) + geom_point() + scale_y_continuous(
 
 <p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-2"/> </p>
 
-<p>Most columns are missing 98% or all data. Let&#39;s see which ones have mainly 
-non-NA entries and which one are mostly <code>NA</code>s</p>
+<p>Most columns are missing 98% or all data. Which columns have mainly 
+non-NA entries and which one are mostly <code>NA</code>s?</p>
 
 <pre><code class="r">head(na.share[na.share$share &lt; 0.5, ], 10)  ## mostly there
 </code></pre>
@@ -277,19 +275,19 @@ non-NA entries and which one are mostly <code>NA</code>s</p>
 ## min_roll_belt           20 0.9793
 </code></pre>
 
-<p>From the names we can see that the columns with missing values are summary 
-statistics of base values, collected over a certain time. Closer inspection 
-reveals that these columns have non-NA entries only when <code>new_window == &quot;yes&quot;</code>, 
-which happens at the end of each window (marked by <code>num_window</code>). Since we will 
-be trying to predict from real-time data in the test set, we can ignore these 
-columns because they will always be <code>NA</code>.</p>
+<p>From the names it becomes clear that the columns with missing values are summary 
+statistics of base values, aggregated over a certain number of observations. 
+Closer inspection reveals that these columns have non-NA entries only when 
+<code>new_window == &quot;yes&quot;</code>, which happens at the end of each window 
+(marked by <code>num_window</code>). Since I am trying to predict from real-time data in 
+the test set, I can ignore these columns.</p>
 
 <pre><code class="r">relevant.cols &lt;- rownames(na.share[na.share$share &lt; 0.5, ])
 d &lt;- d[, relevant.cols]
 </code></pre>
 
-<p>It is also probable that some of the variables are highly correlated, therefore
-making some features mostly redundant. We can perform a principal components
+<p>It is also possible that some of the variables are highly correlated, therefore
+making some features mostly redundant. I perform principal components
 analysis (PCA) on the data to check whether a small number of components 
 captures most of the variance.</p>
 
@@ -304,17 +302,15 @@ ggplot(explained, aes(x = component, y = cumsum(share))) + geom_line() + scale_y
 
 <p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-5"/> </p>
 
-<p>From the plot we see a gradual increase in the explained variation, so we will
-be sticking with the raw predictors. We will be using random forests with 500 
-trees and default settings. This procedure has built-in cross-validation 
-(through out-of-bag error rate), so we do not have to deal with specifying 
-folds in order to estimate the expected out-of-sample error rate.</p>
+<p>The above plot shows a gradual increase in the explained variation, therefore I 
+decided not to use principal components, but raw data. I use random forests 
+with 500 trees and default settings. This procedure has built-in 
+cross-validation (through out-of-bag error rate), so I do not have to deal with specifying folds in order to estimate the expected out-of-sample error rate.</p>
 
-<pre><code class="r">require(randomForest)
+<pre><code class="r">require(randomForest, quietly = TRUE)
 </code></pre>
 
-<pre><code>## Loading required package: randomForest
-## randomForest 4.6-7
+<pre><code>## randomForest 4.6-7
 ## Type rfNews() to see new features/changes/bug fixes.
 </code></pre>
 
