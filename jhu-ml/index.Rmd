@@ -79,7 +79,12 @@ ggplot(explained, aes(x=component, y=cumsum(share))) + geom_line() +
 The above plot shows a gradual increase in the explained variation, therefore I 
 decided not to use principal components, but raw data. I use random forests 
 with 500 trees and default settings. This procedure has built-in 
+<<<<<<< HEAD
 cross-validation (through out-of-bag error rate), so I do not have to deal with specifying folds in order to estimate the expected out-of-sample error rate.
+=======
+cross-validation (through out-of-bag error rate), so I do not have to deal with 
+specifying folds in order to estimate the expected out-of-sample error rate.
+>>>>>>> f7375bfc17593865d43f6917408b1b5cc24f7997
 ```{r}
 require(randomForest, quietly=TRUE)
 model.data <- d[, -(1:6)]      ## all features and classe
@@ -92,8 +97,13 @@ print(rf)
 The reported OOB error rate of `r paste0(round(100*rf$err.rate[500, "OOB"], 2), "%")` 
 is satisfactorily low, so I will use this prodecure to predict from the 
 test data. Based on this low expected error rate I expect to correctly predict all 
+<<<<<<< HEAD
 20 test cases that are part of the assignment. Below is a plot the progression to see how the number of trees improves 
 prediction:
+=======
+20 test cases that are part of the assignment. Below is a plot the progression to see 
+how the number of trees improves prediction:
+>>>>>>> f7375bfc17593865d43f6917408b1b5cc24f7997
 ```{r, fig.height=4}
 errors.rf <- data.frame(trees=1:nrow(rf$err.rate), oob=rf$err.rate[, "OOB"])
 ggplot(errors.rf, aes(x=trees, y=oob)) + geom_line() +
