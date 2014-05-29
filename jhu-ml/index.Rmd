@@ -1,0 +1,106 @@
+Weight-lifting excercise dataset prediction analysis
+========================================================
+
+This analysis was prepared as an assignment for Coursera's Practical Machine
+Learning course. The data was collected from wearable accelerometers attached to
+6 subjects. Each subject was asked to lift a dumbbell in sets of 10 repetitions
+in 5 different styles that correspond to how well the excercise is performed:
+- correctly (class A)
+- throwing elbows to the front (class B)
+- lifting only halfway (class C)
+- lowering only halfway (class D)
+- throwing hips to the front (class E).
+
+Details about the data and how it was collected can be found at 
+[http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises](http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises). 
+
+The purpose of this analysis is to correctly predict the class based on
+accelerometer data. We are provided with a training set (with marked classes) 
+and need to produce estimates for an unmarked test set. 
+
+The training data file was originally downloaded from 
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv).
+```{r}
+d <- read.csv('data/pml-training.csv', na.strings=c("#DIV/0!", "NA"))
+d$X <- NULL    ## drop line number
+dim(d)         ## too large for str
+```
+
+The data has 159 columns, a large number of features, but a quick look at 
+the names and the data itself shows that only some of them have entries on 
+most rows:
+```{r, fig.height=4}
+# get share of NA entries for each column
+na.share <- sapply(d, function(x) mean(is.na(x)))
+na.share <- data.frame(index=1:length(na.share), share=na.share)
+# plot share for each column
+require(ggplot2, quietly=TRUE)   ## for pretty graphics
+require(scales, quietly=TRUE)    ## for axis options
+ggplot(na.share, aes(x=index, y=share)) + geom_point() + 
+  scale_y_continuous(labels=percent_format()) +
+  ggtitle("Share of missing values for each column") +
+  labs(list(x="Column index", y="Share of missing values"))
+```
+
+Most columns are missing 98% or all data. Which columns have mainly 
+non-NA entries and which one are mostly `NA`s?
+```{r}
+head(na.share[na.share$share < 0.5, ], 10)  ## mostly there
+head(na.share[na.share$share > 0.5, ], 10)  ## mostly missing
+```
+
+From the names it becomes clear that the columns with missing values are summary 
+statistics of base values, aggregated over a certain number of observations. 
+Closer inspection reveals that these columns have non-NA entries only when 
+`new_window == "yes"`, which happens at the end of each window 
+(marked by `num_window`). Since I am trying to predict from real-time data in 
+the test set, I can ignore these columns.
+```{r}
+relevant.cols <- rownames(na.share[na.share$share < 0.5,])
+d <- d[, relevant.cols]
+```
+
+It is also possible that some of the variables are highly correlated, therefore
+making some features mostly redundant. I perform principal components
+analysis (PCA) on the data to check whether a small number of components 
+captures most of the variance.
+```{r, fig.height=4}
+pca <- prcomp(x=d[, -c(1:6, 59)], scale=TRUE)     ## all sensor data
+# share of variance explained by each component
+explained <- data.frame(component=1:ncol(pca$x), 
+                        share=pca$sdev^2/sum(pca$sdev^2))
+# plot cumulative share of variance explained by first X components
+ggplot(explained, aes(x=component, y=cumsum(share))) + geom_line() +
+  scale_y_continuous(labels=percent_format()) +
+  ggtitle("Share of variance explained by principal components") +
+  labs(list(x="First principal components", y="Share of variance"))
+```
+
+The above plot shows a gradual increase in the explained variation, therefore I 
+decided not to use principal components, but raw data. I use random forests 
+with 500 trees and default settings. This procedure has built-in 
+cross-validation (through out-of-bag error rate), so I do not have to deal with specifying folds in order to estimate the expected out-of-sample error rate.
+```{r}
+require(randomForest, quietly=TRUE)
+model.data <- d[, -(1:6)]      ## all features and classe
+# train model
+set.seed(2014)
+rf <- randomForest(classe ~ ., data=model.data, ntree=500)
+print(rf)
+```
+
+The reported OOB error rate of `r paste0(round(100*rf$err.rate[500, "OOB"], 2), "%")` 
+is satisfactorily low, so I will use this prodecure to predict from the 
+test data. Based on this low expected error rate I expect to correctly predict all 
+20 test cases that are part of the assignment. Below is a plot the progression to see how the number of trees improves 
+prediction:
+```{r, fig.height=4}
+errors.rf <- data.frame(trees=1:nrow(rf$err.rate), oob=rf$err.rate[, "OOB"])
+ggplot(errors.rf, aes(x=trees, y=oob)) + geom_line() +
+  scale_y_continuous(labels=percent_format()) +
+  ggtitle("Out-of-bag (OOB) error rate by number of trees") +
+  labs(list(x="Trees in random forest", y="OOB misclassification rate"))
+```
+
+The plot shows that even a smaller number of trees should result in a similarly 
+low error rate. 
