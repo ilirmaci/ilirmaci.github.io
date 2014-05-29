@@ -1,5 +1,4 @@
-Coursera Practical Machine Learning - Assignment
-================================================
+### Coursera Practical Machine Learning - Assignment
 
 This repository contains files and code for Coursera's Practical Machine Learning course. 
 The data  is from the [Weight Lifting Excercises 
